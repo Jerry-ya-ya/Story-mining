@@ -1,0 +1,25 @@
+services:
+  story-postgres:
+    image: postgres:16
+    container_name: story-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - story_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  story-api:
+    build: ./story-api
+    container_name: story-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://story_user:change_this_password@story-postgres:5432/story_mining_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - story-postgres
+
+volumes:
+  story_postgres_data:
